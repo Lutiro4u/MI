@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cuestionario Personalizado</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    /* --- Variables CSS para Temas --- */
+    :root {
+      /* Modo Oscuro (Default) */
+      --bg-color: #1a1a2e;
+      --card-bg: #2a2a3f;
+      --text-color: #e0e0e0;
+      --text-muted-color: #a0a0a0;
+      --border-color: #40405f;
+      --input-bg: #1f1f34;
+      --accent-color: #5a9cf8;
+      --accent-hover-color: #4a8ce0;
+      --secondary-color: #f39c12;
+      --secondary-hover-color: #e67e22;
+      --red-color: #e74c3c;
+      --red-hover-color: #c0392b;
+      --green-color: #2ecc71;
+      --green-hover-color: #27ae60;
+      --yellow-color: #f1c40f;
+      --yellow-hover-color: #f39c12;
+      --correct-bg: rgba(46, 204, 113, 0.1);
+      --incorrect-bg: rgba(231, 76, 60, 0.1);
+      --shadow-color: rgba(0, 0, 0, 0.2);
+      --toggle-icon: '🌙';
+      --green-color-rgb: 46, 204, 113; /* Para RGBA */
+      --red-color-rgb: 231, 76, 60; /* Para RGBA */
+    }
+
+    body.light-mode {
+      /* Modo Claro */
+      --bg-color: #f4f7f9;
+      --card-bg: #ffffff;
+      --text-color: #212529;
+      --text-muted-color: #6c757d;
+      --border-color: #dee2e6;
+      --input-bg: #ffffff;
+      --accent-color: #007bff;
+      --accent-hover-color: #0056b3;
+      --secondary-color: #fd7e14;
+      --secondary-hover-color: #e85d04;
+      --red-color: #dc3545;
+      --red-hover-color: #c82333;
+      --green-color: #28a745;
+      --green-hover-color: #218838;
+      --yellow-color: #ffc107;
+      --yellow-hover-color: #e0a800;
+      --correct-bg: rgba(40, 167, 69, 0.1);
+      --incorrect-bg: rgba(220, 53, 69, 0.1);
+      --shadow-color: rgba(0, 0, 0, 0.1);
+      --toggle-icon: '☀️';
+      --green-color-rgb: 40, 167, 69; /* Para RGBA */
+      --red-color-rgb: 220, 53, 69; /* Para RGBA */
+    }
+
+    /* --- Estilos Base Modernizados --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+       scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 20px auto;
+      padding: 15px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 15px var(--shadow-color);
+      border: 1px solid var(--border-color);
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    h2, h3 {
+      color: var(--accent-color);
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    /* --- Estilos de Formularios Modernizados --- */
+    label {
+      display: block;
+      background: none;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      border: 1px solid var(--border-color);
+    }
+
+    label:hover {
+      background: rgba(120, 120, 120, 0.1);
+      border-color: var(--accent-color);
+    }
+    label.info-label {
+        background: none !important;
+        padding: 0;
+        margin-bottom: 5px;
+        cursor: default;
+        border: none;
+        font-weight: 500;
+        color: var(--text-muted-color);
+     }
+     label.info-label:hover {
+         background: none;
+         border: none;
+     }
+
+    input[type="text"], input[type="number"], textarea, select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--text-color);
+      font-size: 1rem;
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+    }
+    input[type="number"].input-corto {
+        width: 100px;
+        display: inline-block;
+        margin-left: 8px;
+    }
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 2px rgba(var(--accent-color), 0.2); /* Sombra foco más sutil */
+    }
+
+    /* Estilo creación opción múltiple */
+    .opcion-multiple-creacion {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 10px;
+    }
+    .opcion-multiple-creacion input[type="text"] {
+        flex-grow: 1;
+        margin-bottom: 0;
+    }
+    .opcion-multiple-creacion input[type="checkbox"] {
+        width: 1.2em;
+        height: 1.2em;
+        margin-right: 5px;
+        cursor: pointer;
+        accent-color: var(--accent-color);
+        flex-shrink: 0; /* Evitar que se encoja */
+    }
+     .opcion-multiple-creacion label {
+        margin-bottom: 0;
+        padding: 0;
+        background: none;
+        border: none;
+        display: flex;
+        align-items: center;
+        color: var(--text-muted-color);
+        white-space: nowrap;
+        flex-shrink: 0;
+     }
+     .opcion-multiple-creacion label:hover {
+         background: none;
+         border: none;
+     }
+
+    /* --- Estilos de Botones Modernizados --- */
+    button {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+      transition: background-color 0.2s, transform 0.1s;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+     button:hover:not(:disabled) {
+      background-color: var(--accent-hover-color);
+      transform: translateY(-1px);
+    }
+    button:active:not(:disabled) {
+        transform: translateY(0px);
+    }
+     button:disabled {
+        background-color: var(--text-muted-color);
+        cursor: not-allowed;
+        opacity: 0.7;
+     }
+
+    .btn-secundario { background-color: var(--secondary-color); }
+    .btn-secundario:hover:not(:disabled) { background-color: var(--secondary-hover-color); }
+    .btn-rojo { background-color: var(--red-color); }
+    .btn-rojo:hover:not(:disabled) { background-color: var(--red-hover-color); }
+    .btn-verde { background-color: var(--green-color); }
+    .btn-verde:hover:not(:disabled) { background-color: var(--green-hover-color); }
+    .btn-amarillo { background-color: var(--yellow-color); }
+    .btn-amarillo:hover:not(:disabled) { background-color: var(--yellow-hover-color); }
+
+    /* Botón eliminar opción (X) más pequeño */
+    .opcion-multiple-creacion .btn-rojo {
+        min-width: auto;
+        padding: 6px 10px;
+        font-size: 0.9rem;
+        margin-left: 5px;
+        flex-shrink: 0; /* Evitar que se encoja */
+    }
+
+    /* --- Estilos de Feedback Modernizados --- */
+    /* Aplicar directamente a la etiqueta contenedora */
+    label.correcta {
+      background-color: var(--correct-bg) !important;
+      border-left: 4px solid var(--green-color) !important;
+      color: var(--green-color) !important;
+      font-weight: 600;
+      padding-left: 8px; /* Añadir padding para que el borde no pegue al texto */
+    }
+
+    label.incorrecta {
+      background-color: var(--incorrect-bg) !important;
+      border-left: 4px solid var(--red-color) !important;
+      color: var(--red-color) !important;
+      padding-left: 8px;
+       /* text-decoration: line-through; - Quizás no es necesario */
+    }
+
+    label.faltante {
+        border-left: 4px solid var(--green-color) !important;
+        background-color: rgba(var(--green-color-rgb), 0.05) !important;
+        font-style: italic;
+        color: var(--text-muted-color) !important;
+        padding-left: 8px;
+    }
+
+    .puntaje-btn {
+      background-color: var(--secondary-color);
+      color: white;
+      padding: 6px 12px;
+      margin: 4px;
+      border-radius: 5px;
+      min-width: 40px;
+    }
+    .puntaje-btn:hover {
+      background-color: var(--secondary-hover-color);
+    }
+
+    .estado {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 600;
+      font-size: 1.2em;
+      color: var(--text-color);
+    }
+    .estado.vidas-bajas {
+        color: var(--red-color);
+        font-weight: 700;
+    }
+
+    /* --- NUEVO: Estilo Botón Cambio de Tema --- */
+    #theme-toggle-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      font-size: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 2px 10px var(--shadow-color);
+      z-index: 1000;
+      transition: background-color 0.3s, color 0.3s, transform 0.2s;
+    }
+    #theme-toggle-button:hover {
+      transform: scale(1.1);
+      background-color: var(--accent-color);
+      color: white;
+    }
+    #theme-toggle-button::before {
+      content: var(--toggle-icon);
+    }
+
+    /* --- Controles Meta de Pregunta (Tipo, Puntos, Eliminar) --- */
+    .pregunta-meta-controles {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin: 15px 0;
+    }
+    .pregunta-meta-controles select {
+         width: auto;
+         flex-grow: 1;
+         margin-bottom: 0;
+    }
+    .pregunta-meta-controles .input-puntos {
+        width: 70px;
+        margin-bottom: 0;
+        flex-shrink: 0; /* Evitar que se encoja */
+    }
+    .pregunta-meta-controles .btn-rojo {
+        margin-left: auto; /* Empujar botón a la derecha */
+        padding: 6px 10px;
+        min-width: auto;
+        flex-shrink: 0; /* Evitar que el botón se encoja */
+    }
+    .pregunta-meta-controles .info-label {
+         margin-bottom: 0;
+         white-space: nowrap; /* Evitar que texto de label se parta */
+         flex-shrink: 0; /* Evitar que las labels se encojan */
+    }
+
+
+    /* --- Ajustes Responsivos --- */
+    @media (max-width: 600px) {
+      .container {
+          padding: 10px;
+          margin: 10px auto;
+      }
+      .card {
+          padding: 15px;
+          margin-bottom: 15px;
+      }
+      h2 { font-size: 1.5rem; }
+      h3 { font-size: 1.3rem; }
+
+      button, input, textarea, select {
+        font-size: 0.95rem;
+      }
+      button { padding: 8px 15px; }
+
+       .opcion-multiple-creacion {
+           flex-wrap: wrap; /* Permitir wrap si no caben */
+       }
+
+        input[type="number"].input-corto {
+            width: 80px;
+        }
+         /* Centrar label de vidas en móvil */
+         div[style*="text-align: center"] label {
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             width: 100%; /* Ocupar ancho para centrar bien */
+         }
+          div[style*="text-align: center"] label span {
+              margin-bottom: 5px;
+          }
+
+      #theme-toggle-button {
+          width: 40px;
+          height: 40px;
+          font-size: 1.3rem;
+          bottom: 15px;
+          right: 15px;
+      }
+
+      /* CORRECCIÓN MÓVIL: Hacer wrap en controles de pregunta */
+      .pregunta-meta-controles {
+          flex-wrap: wrap;
+          gap: 10px;
+      }
+      .pregunta-meta-controles .input-puntos {
+           width: 60px; /* Más pequeño en móvil */
+      }
+      /* Opcional: si el botón eliminar se ve mal al final de la línea */
+      /*
+      .pregunta-meta-controles .btn-rojo {
+           margin-left: 0; // Quitar margen auto
+           margin-top: 8px; // Añadir espacio arriba si salta de línea
+           width: 100%; // Hacerlo ancho completo si está solo
+           text-align: center;
+      }
+      */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h2>Mis Cuestionarios</h2>
+      <select id="listaCuestionarios"></select>
+      <button id="btnCargar" onclick="cargarCuestionarioSeleccionado()">Cargar</button>
+      <button id="btnEditar" class="btn-amarillo" onclick="iniciarEdicion()">Editar</button>
+      <button id="btnEliminar" class="btn-rojo" onclick="eliminarCuestionario()">Eliminar</button>
+      <button class="btn-secundario" onclick="mostrarCreacion()">Crear nuevo</button>
+    </div>
+
+    <div class="card" id="creacionCuestionario" style="display:none;">
+      <h3 id="tituloEditor">Crear Cuestionario</h3>
+      <input type="text" id="nombreCuestionario" placeholder="Nombre del cuestionario" />
+      <input type="hidden" id="nombreOriginal" value="">
+
+      <div style="margin: 15px 0; text-align: center;">
+          <label for="numVidas" class="info-label" style="display:inline-block; margin-bottom: 5px;">
+             <span>Vidas (0 = ∞):</span>
+             <input type="number" id="numVidas" value="3" min="0" class="input-corto">
+          </label>
+      </div>
+
+      <div id="preguntasContainer"></div>
+      <button class="btn-verde" onclick="agregarPregunta()">Agregar Pregunta</button>
+      <button onclick="guardarCuestionario()">Guardar Cuestionario</button>
+      <button class="btn-rojo" onclick="cancelarCreacion()">Cancelar</button>
+    </div>
+
+    <div class="card" id="cuestionarioContainer" style="display:none;">
+      <h3 id="tituloCuestionario"></h3>
+      <div class="estado" id="vidas">Vidas: 3</div>
+      <form id="formCuestionario" onsubmit="return false;"></form>
+      <div id="resultado"></div>
+      <button onclick="reiniciarCuestionario()">Reiniciar</button>
+      <button class="btn-rojo" onclick="volverLista()">Volver a la lista</button>
+    </div>
+  </div>
+
+  <button id="theme-toggle-button" title="Cambiar tema"></button>
+
+  <audio id="sonidoCorrecto" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+  <audio id="sonidoIncorrecto" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" preload="auto"></audio>
+
+  <script>
+    // --- Inicio: Lógica de Cambio de Tema ---
+    const themeToggleButton = document.getElementById('theme-toggle-button');
+    const currentTheme = localStorage.getItem('theme');
+
+    if (currentTheme === 'light') {
+        document.body.classList.add('light-mode');
+    }
+
+    themeToggleButton.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        let theme = document.body.classList.contains('light-mode') ? 'light' : 'dark';
+        localStorage.setItem('theme', theme);
+    });
+    // --- Fin: Lógica de Cambio de Tema ---
+
+
+    // --- Resto del JavaScript ---
+    let vidas = 3;
+    let puntos = 0;
+    let puntosPorPregunta = 5;
+    let cuestionarioActual = null;
+    let infiniteLives = false;
+    let currentQuizName = null;
+    let gameOverTimeout = null;
+
+    function mostrarCreacion(quizData = null) {
+        const esEdicion = quizData !== null;
+        document.getElementById("tituloEditor").textContent = esEdicion ? "Editar Cuestionario" : "Crear Cuestionario";
+        document.getElementById("nombreCuestionario").value = esEdicion ? quizData.nombre : '';
+        document.getElementById("nombreOriginal").value = esEdicion ? quizData.nombre : '';
+        document.getElementById("numVidas").value = esEdicion ? (quizData.vidas ?? 3) : 3;
+
+        document.getElementById("creacionCuestionario").style.display = "block";
+        document.getElementById("cuestionarioContainer").style.display = "none";
+        document.getElementById("preguntasContainer").innerHTML = '';
+
+        if (esEdicion && quizData.preguntas && quizData.preguntas.length > 0) {
+            quizData.preguntas.forEach(p => agregarPregunta(p));
+        } else if (!esEdicion) {
+            agregarPregunta();
+        }
+        document.getElementById('creacionCuestionario').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelarCreacion() {
+         document.getElementById("creacionCuestionario").style.display = "none";
+         document.getElementById("nombreOriginal").value = '';
+    }
+
+    function volverLista() {
+        document.getElementById("cuestionarioContainer").style.display = "none";
+        document.getElementById("resultado").innerHTML = "";
+        currentQuizName = null;
+        clearTimeout(gameOverTimeout);
+    }
+
+    function agregarPregunta(preguntaData = null) {
+      const container = document.createElement("div");
+      container.className = "card"; // Usar clase card para preguntas individuales
+      container.style.marginBottom = "15px";
+      const textoPregunta = preguntaData?.texto || "";
+      const tipoPregunta = preguntaData?.tipo || "opcion";
+      const puntosPregunta = preguntaData?.puntos || 5;
+
+      // CORREGIDO: Eliminado el comentario { /* ... */ } de esta sección
+      container.innerHTML = `
+        <textarea placeholder="Texto de la pregunta">${textoPregunta}</textarea>
+        <div class="pregunta-meta-controles">
+            <label class="info-label">Tipo:</label>
+            <select>
+              <option value="opcion" ${tipoPregunta === 'opcion' ? 'selected' : ''}>Opción Simple</option>
+              <option value="multiple" ${tipoPregunta === 'multiple' ? 'selected' : ''}>Selección Múltiple</option>
+              <option value="texto" ${tipoPregunta === 'texto' ? 'selected' : ''}>Respuesta Abierta</option>
+            </select>
+            <label class="info-label">Puntos:</label>
+            <input type="number" placeholder="Pts" min="1" value="${puntosPregunta}" class="input-puntos" />
+            <button class="btn-rojo" onclick="this.closest('.card').remove()">Eliminar</button>
+        </div>
+        <div class="opciones" style="margin-top: 15px;"></div>
+      `;
+
+      const selectTipo = container.querySelector("select");
+      const opcionesDiv = container.querySelector(".opciones");
+
+      selectTipo.onchange = function () {
+        actualizarOpcionesUI(this.value, opcionesDiv, preguntaData, container);
+      };
+      selectTipo.dispatchEvent(new Event("change"));
+      document.getElementById("preguntasContainer").appendChild(container);
+    }
+
+    function actualizarOpcionesUI(tipo, opcionesDiv, preguntaData = null, preguntaContainer) {
+        opcionesDiv.innerHTML = '';
+        const opciones = preguntaData?.opciones || [];
+        const correctas = preguntaData?.correctas || [];
+
+        if (tipo === "opcion") {
+            opcionesDiv.innerHTML = `
+                <input type="text" placeholder="Respuesta CORRECTA" value="${opciones[0] || ''}">
+                <input type="text" placeholder="Respuesta incorrecta" value="${opciones[1] || ''}">
+                <input type="text" placeholder="Respuesta incorrecta" value="${opciones[2] || ''}">
+            `;
+        } else if (tipo === "multiple") {
+            if (preguntaData && opciones.length > 0) {
+                opciones.forEach((opTexto, index) => {
+                    const esCorrecta = correctas.includes(index);
+                    agregarOpcionMultipleUI(opcionesDiv, opTexto, esCorrecta, index < 2);
+                });
+            } else {
+                 agregarOpcionMultipleUI(opcionesDiv, '', false, true);
+                 agregarOpcionMultipleUI(opcionesDiv, '', false, true);
+            }
+            const btnAgregarOpcion = document.createElement("button");
+            btnAgregarOpcion.textContent = "+ Opción";
+            btnAgregarOpcion.className = "btn-secundario";
+            btnAgregarOpcion.style.padding = "6px 12px";
+            btnAgregarOpcion.style.fontSize = "0.9rem";
+            btnAgregarOpcion.type = "button";
+            btnAgregarOpcion.onclick = function() { agregarOpcionMultipleUI(opcionesDiv); };
+            opcionesDiv.appendChild(btnAgregarOpcion);
+
+        } else if (tipo === "texto") {
+            opcionesDiv.innerHTML = `<textarea placeholder="Respuesta sugerida (para autoevaluación)">${opciones[0] || ''}</textarea>`;
+        }
+    }
+
+    function agregarOpcionMultipleUI(opcionesDiv, texto = '', esCorrecta = false, noEliminar = false) {
+        const opcionContainer = document.createElement("div");
+        opcionContainer.className = 'opcion-multiple-creacion';
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = "Texto de la opción";
+        input.value = texto;
+
+        const label = document.createElement('label');
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.title = "Marcar como correcta";
+        checkbox.checked = esCorrecta;
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(" Correcta"));
+
+        opcionContainer.appendChild(input);
+        opcionContainer.appendChild(label);
+
+        if (!noEliminar) {
+            const btnEliminarOpcion = document.createElement("button");
+            btnEliminarOpcion.textContent = "X";
+            btnEliminarOpcion.className = "btn-rojo";
+            btnEliminarOpcion.type = "button";
+            btnEliminarOpcion.onclick = function() {
+                opcionContainer.remove();
+            };
+            opcionContainer.appendChild(btnEliminarOpcion);
+        }
+        opcionesDiv.appendChild(opcionContainer);
+    }
+
+    function guardarCuestionario() {
+        const nombre = document.getElementById("nombreCuestionario").value.trim();
+        const nombreOriginal = document.getElementById("nombreOriginal").value.trim();
+        const esEdicion = nombreOriginal !== '';
+        const vidasCuestionarioInput = document.getElementById("numVidas").value;
+        const vidasCuestionario = parseInt(vidasCuestionarioInput);
+
+        if (!nombre) { alert("Asigna un nombre al cuestionario."); return; }
+        if (vidasCuestionarioInput === '' || isNaN(vidasCuestionario) || vidasCuestionario < 0) { alert("Vidas debe ser 0 o mayor."); return; }
+        if (nombre !== nombreOriginal && localStorage.getItem(nombre)) { if (!confirm(`"${nombre}" ya existe. ¿Sobrescribir?`)) return; }
+
+        const preguntasDivs = document.querySelectorAll("#preguntasContainer > .card");
+        if (preguntasDivs.length === 0) { alert("Agrega al menos una pregunta."); return; }
+
+        const preguntas = []; let error = false;
+        preguntasDivs.forEach((div, index) => {
+            if (error) return;
+            const texto = div.querySelector("textarea")?.value.trim();
+            const tipo = div.querySelector("select")?.value;
+            const puntosInput = div.querySelector(".input-puntos");
+            const puntosPregunta = parseInt(puntosInput?.value.trim() || '0');
+
+            if (!texto) { alert(`Pregunta ${index + 1}: Texto vacío.`); error = true; return; }
+            if (!tipo) { alert(`Pregunta ${index + 1}: Tipo no encontrado.`); error = true; return; }
+            if (isNaN(puntosPregunta) || puntosPregunta <= 0) { alert(`Pregunta ${index + 1}: Puntos inválidos (> 0).`); error = true; return; }
+
+            let opciones = []; let correctas = [];
+            const opcionesDiv = div.querySelector(".opciones");
+            if (!opcionesDiv) { alert(`Error interno: Opciones no encontradas (Pregunta ${index + 1}).`); error = true; return; }
+
+            if (tipo === "opcion") {
+                const inputs = opcionesDiv.querySelectorAll("input[type='text']");
+                if (inputs.length < 3) { alert(`Pregunta ${index + 1} (Simple): Faltan opciones.`); error = true; return; }
+                inputs.forEach(input => opciones.push(input.value.trim()));
+                if (opciones.some(o => !o)) { alert(`Pregunta ${index + 1} (Simple): Completa todas las opciones.`); error = true; return; }
+            } else if (tipo === "multiple") {
+                const optionDivs = opcionesDiv.querySelectorAll(".opcion-multiple-creacion");
+                if (optionDivs.length < 2) { alert(`Pregunta ${index + 1} (Múltiple): Mínimo 2 opciones.`); error = true; return; }
+                optionDivs.forEach((optDiv, idx) => {
+                    const input = optDiv.querySelector('input[type="text"]'); const checkbox = optDiv.querySelector('input[type="checkbox"]');
+                    const opcionTexto = input?.value.trim(); if (!opcionTexto) { alert(`Pregunta ${index + 1}, Opción ${idx + 1}: Texto vacío.`); error = true; return; }
+                    opciones.push(opcionTexto); if (checkbox?.checked) correctas.push(idx);
+                });
+                if (error) return;
+                if (correctas.length === 0) { alert(`Pregunta ${index + 1} (Múltiple): Marca al menos una correcta.`); error = true; return; }
+                if (correctas.length === opciones.length) { alert(`Pregunta ${index + 1} (Múltiple): No todas pueden ser correctas.`); error = true; return; }
+            } else if (tipo === "texto") {
+                const textareaRespuesta = opcionesDiv.querySelector("textarea"); const respuestaSugerida = textareaRespuesta?.value.trim();
+                if (!respuestaSugerida) { alert(`Pregunta ${index + 1} (Abierta): Falta respuesta sugerida.`); error = true; return; }
+                opciones.push(respuestaSugerida);
+            } else { alert(`Pregunta ${index + 1}: Tipo desconocido "${tipo}".`); error = true; return; }
+
+            if (!error) {
+                const preguntaData = { texto, tipo, opciones , puntos: puntosPregunta};
+                if (tipo === "multiple") preguntaData.correctas = correctas;
+                preguntas.push(preguntaData);
+            }
+        });
+
+        if (error) { console.log("Guardado cancelado por errores."); return; }
+        try {
+            const quizCompleto = { nombre: nombre, vidas: vidasCuestionario, preguntas: preguntas };
+            if (esEdicion && nombre !== nombreOriginal && localStorage.getItem(nombreOriginal)) localStorage.removeItem(nombreOriginal);
+            localStorage.setItem(nombre, JSON.stringify(quizCompleto));
+            cargarLista(); alert(`Cuestionario "${nombre}" guardado.`);
+            document.getElementById("creacionCuestionario").style.display = "none"; document.getElementById("nombreOriginal").value = '';
+        } catch (e) { alert("Error al guardar. ¿Almacenamiento lleno?"); console.error("Error localStorage:", e); }
+    }
+
+    function cargarLista() {
+        const lista = document.getElementById("listaCuestionarios"); lista.innerHTML = "";
+        let keys = [];
+        try { keys = Object.keys(localStorage).filter(k => k !== 'theme'); }
+        catch (e) { console.error("Error acceso localStorage:", e); alert("Error al leer cuestionarios."); return; }
+        let hayCuestionariosValidos = false;
+        keys.forEach(k => {
+            try {
+                const data = JSON.parse(localStorage.getItem(k));
+                if ((typeof data === 'object' && data !== null && Array.isArray(data.preguntas)) || Array.isArray(data)) {
+                    const option = document.createElement("option"); option.value = k; option.textContent = k;
+                    lista.appendChild(option); hayCuestionariosValidos = true;
+                } else console.warn(`Item "${k}" no es cuestionario válido.`);
+            } catch (e) { console.warn(`Error parseando "${k}":`, e); }
+        });
+        if (!hayCuestionariosValidos) { const option = document.createElement("option"); option.textContent = "No hay cuestionarios"; option.disabled = true; lista.appendChild(option); }
+        document.getElementById("btnCargar").disabled = !hayCuestionariosValidos; document.getElementById("btnEditar").disabled = !hayCuestionariosValidos; document.getElementById("btnEliminar").disabled = !hayCuestionariosValidos;
+    }
+
+     function eliminarCuestionario() {
+        const lista = document.getElementById("listaCuestionarios"); if (lista.selectedIndex < 0 || lista.options[lista.selectedIndex].disabled) { alert("Selecciona cuestionario a eliminar."); return; }
+        const nombre = lista.value; if (confirm(`¿Eliminar "${nombre}"?`)) {
+            localStorage.removeItem(nombre); cargarLista(); alert(`"${nombre}" eliminado.`);
+            if (currentQuizName === nombre) { document.getElementById("cuestionarioContainer").style.display = "none"; cuestionarioActual = null; currentQuizName = null; }
+        }
+    }
+
+    function iniciarEdicion() {
+        const lista = document.getElementById("listaCuestionarios"); if (lista.selectedIndex < 0 || lista.options[lista.selectedIndex].disabled) { alert("Selecciona cuestionario a editar."); return; }
+        const nombre = lista.value; let datos;
+        try {
+            const rawData = localStorage.getItem(nombre); if (!rawData) throw new Error("No encontrado"); datos = JSON.parse(rawData);
+            if (Array.isArray(datos)) datos = { nombre: nombre, vidas: 3, preguntas: datos };
+            else if (typeof datos !== 'object' || !Array.isArray(datos.preguntas)) throw new Error("Formato inválido");
+            datos.vidas = datos.vidas ?? 3;
+        } catch (e) { alert(`Error al cargar "${nombre}" para editar: ${e.message}`); console.error("Error edición:", e); return; }
+        mostrarCreacion(datos);
+    }
+
+     function cargarCuestionarioSeleccionado() {
+        const lista = document.getElementById("listaCuestionarios"); if (lista.selectedIndex < 0 || lista.options[lista.selectedIndex].disabled) { alert("Selecciona cuestionario."); return; }
+        cargarCuestionario(lista.value);
+    }
+
+    function cargarCuestionario(nombre) {
+        let datos;
+        try {
+            const rawData = localStorage.getItem(nombre); if (!rawData) throw new Error("No encontrado"); datos = JSON.parse(rawData);
+            if (Array.isArray(datos)) cuestionarioActual = { nombre: nombre, vidas: 3, preguntas: datos };
+            else if (typeof datos === 'object' && datos !== null && Array.isArray(datos.preguntas)) { cuestionarioActual = datos; cuestionarioActual.vidas = cuestionarioActual.vidas ?? 3; }
+            else throw new Error("Formato inválido");
+        } catch (e) { alert(`Error al cargar "${nombre}": ${e.message}`); console.error("Error carga:", e); cuestionarioActual = null; currentQuizName = null; return; }
+
+        infiniteLives = cuestionarioActual.vidas === 0; vidas = infiniteLives ? Infinity : cuestionarioActual.vidas;
+        puntos = 0; currentQuizName = nombre; clearTimeout(gameOverTimeout);
+
+        document.getElementById("tituloCuestionario").textContent = nombre; const form = document.getElementById("formCuestionario"); form.innerHTML = "";
+        document.getElementById("resultado").innerHTML = ""; document.getElementById("cuestionarioContainer").style.display = "block"; document.getElementById("creacionCuestionario").style.display = "none";
+        actualizarVidas();
+
+        const preguntasMezcladas = [...cuestionarioActual.preguntas].sort(() => Math.random() - 0.5);
+        preguntasMezcladas.forEach((p, idxMostrado) => {
+            const idxOriginal = cuestionarioActual.preguntas.findIndex(orig => orig === p); const divPregunta = document.createElement("div");
+            divPregunta.style.marginBottom = "25px"; divPregunta.style.paddingBottom = "15px"; divPregunta.style.borderBottom = `1px solid var(--border-color)`;
+            divPregunta.dataset.respondida = "false";
+            divPregunta.innerHTML = `<p style="font-weight: 500; margin-bottom: 15px;"><strong>${idxMostrado + 1}. ${p.texto}</strong> <span style="font-size:0.9em; color: var(--text-muted-color);">(${p.puntos || puntosPorPregunta} Pts)</span></p>`;
+            const opcionesContainer = document.createElement('div'); opcionesContainer.style.display = 'flex'; opcionesContainer.style.flexDirection = 'column'; opcionesContainer.style.gap = '8px';
+
+            if (p.tipo === "opcion") {
+              const opcionesMezcladas = [...p.opciones]; const correcta = opcionesMezcladas[0]; opcionesMezcladas.sort(() => Math.random() - 0.5);
+              opcionesMezcladas.forEach((op) => {
+                const label = document.createElement("label"); const input = document.createElement("input");
+                input.type = "radio"; input.name = `p${idxOriginal}`; input.value = (op === correcta) ? 'correcto' : 'incorrecto';
+                input.dataset.textoOpcion = op; input.style.marginRight = "8px";
+                label.appendChild(input); label.appendChild(document.createTextNode(op));
+                input.addEventListener("change", (e) => { if (divPregunta.dataset.respondida === "true" || (!infiniteLives && vidas <= 0)) return; handleRespuestaSimple(e.target, divPregunta, p); });
+                opcionesContainer.appendChild(label);
+              });
+            } else if (p.tipo === "multiple") {
+                 const opcionesConIndices = p.opciones.map((op, index) => ({ texto: op, indexOriginal: index })); opcionesConIndices.sort(() => Math.random() - 0.5);
+                 opcionesConIndices.forEach((opData) => {
+                    const label = document.createElement("label"); const input = document.createElement("input");
+                    input.type = "checkbox"; input.name = `p${idxOriginal}_${opData.indexOriginal}`; input.dataset.index = opData.indexOriginal;
+                    input.style.marginRight = "8px"; input.style.accentColor = 'var(--accent-color)';
+                    label.appendChild(input); label.appendChild(document.createTextNode(opData.texto));
+                    opcionesContainer.appendChild(label);
+                 });
+                 const btnVerificar = document.createElement("button"); btnVerificar.textContent = "Verificar"; btnVerificar.style.marginTop = "10px"; btnVerificar.style.alignSelf = "flex-start";
+                 btnVerificar.onclick = (e) => { if (divPregunta.dataset.respondida === "true" || (!infiniteLives && vidas <= 0)) return; handleRespuestaMultiple(divPregunta, p, e.target); };
+                 opcionesContainer.appendChild(btnVerificar);
+            } else if (p.tipo === "texto") {
+              const textarea = document.createElement("textarea"); textarea.placeholder = "Escribe tu respuesta..."; textarea.rows = 3;
+              const btnEvaluar = document.createElement("button"); const divSugerida = document.createElement("div");
+              divSugerida.style.marginTop = '15px'; divSugerida.style.padding = '10px'; divSugerida.style.backgroundColor = 'rgba(120, 120, 120, 0.1)';
+              divSugerida.style.borderRadius = '6px'; divSugerida.style.display = 'none';
+              const divEvaluacion = document.createElement("div"); divEvaluacion.style.marginTop = '10px'; divEvaluacion.style.display = 'none';
+              btnEvaluar.textContent = "Evaluar Respuesta"; btnEvaluar.style.marginTop = "10px"; btnEvaluar.style.alignSelf = "flex-start";
+              btnEvaluar.onclick = () => { if (!textarea.value.trim()) { alert("Escribe tu respuesta."); return; } if (divPregunta.dataset.respondida === "true" || (!infiniteLives && vidas <= 0)) return; handleRespuestaTexto(textarea, divPregunta, p, btnEvaluar, divSugerida, divEvaluacion); };
+              opcionesContainer.appendChild(textarea); opcionesContainer.appendChild(btnEvaluar); opcionesContainer.appendChild(divSugerida); opcionesContainer.appendChild(divEvaluacion);
+            }
+            divPregunta.appendChild(opcionesContainer); form.appendChild(divPregunta);
+        });
+        document.getElementById('cuestionarioContainer').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function handleRespuestaSimple(inputSeleccionado, divPregunta, preguntaData) {
+        divPregunta.querySelectorAll("label").forEach(l => l.classList.remove('correcta', 'incorrecta', 'faltante')); const esCorrecta = inputSeleccionado.value === 'correcto'; const labelSeleccionada = inputSeleccionado.closest("label");
+        if (esCorrecta) { labelSeleccionada.classList.add("correcta"); puntos += preguntaData.puntos || puntosPorPregunta; sonido("sonidoCorrecto"); }
+        else { labelSeleccionada.classList.add("incorrecta"); const inputCorrecto = divPregunta.querySelector("input[value='correcto']"); if (inputCorrecto) inputCorrecto.closest("label").classList.add("correcta"); if (!infiniteLives) { vidas--; actualizarVidas(); } sonido("sonidoIncorrecto"); }
+        divPregunta.querySelectorAll("input[type='radio']").forEach(i => i.disabled = true); divPregunta.dataset.respondida = "true"; verificarFinCuestionario();
+    }
+
+    function handleRespuestaMultiple(divPregunta, preguntaData, botonVerificar) {
+        const checkboxes = divPregunta.querySelectorAll("input[type='checkbox']"); const indicesSeleccionados = []; checkboxes.forEach(cb => { if (cb.checked) indicesSeleccionados.push(parseInt(cb.dataset.index)); });
+        const indicesCorrectos = preguntaData.correctas || []; let completamenteCorrecta = indicesCorrectos.length > 0 && indicesCorrectos.every(idx => indicesSeleccionados.includes(idx)) && indicesSeleccionados.every(idx => indicesCorrectos.includes(idx));
+        checkboxes.forEach(cb => { const label = cb.closest("label"); const idxOpcion = parseInt(cb.dataset.index); const esOpcionCorrecta = indicesCorrectos.includes(idxOpcion); label.classList.remove('correcta', 'incorrecta', 'faltante'); if (esOpcionCorrecta) label.classList.add(cb.checked ? "correcta" : "faltante"); else if (cb.checked) label.classList.add("incorrecta"); cb.disabled = true; });
+        if (completamenteCorrecta) { puntos += preguntaData.puntos || puntosPorPregunta; sonido("sonidoCorrecto"); } else { if (!infiniteLives) { vidas--; actualizarVidas(); } sonido("sonidoIncorrecto"); }
+        divPregunta.dataset.respondida = "true"; botonVerificar.disabled = true; botonVerificar.textContent = "Verificado"; verificarFinCuestionario();
+    }
+
+    function handleRespuestaTexto(textarea, divPregunta, preguntaData, botonEvaluar, divSugerida, divEvaluacion) {
+        divSugerida.innerHTML = `<strong>Sugerencia:</strong> ${preguntaData.opciones[0]}`; divSugerida.style.display = 'block'; divEvaluacion.innerHTML = `<strong>Evalúa (1-${preguntaData.puntos || puntosPorPregunta} pts):</strong> `; divEvaluacion.style.display = 'block';
+        const puntosMax = preguntaData.puntos || puntosPorPregunta;
+        for (let i = 1; i <= puntosMax; i++) { const btnPuntaje = document.createElement("button"); btnPuntaje.textContent = i; btnPuntaje.className = "puntaje-btn"; btnPuntaje.onclick = () => { if (divPregunta.dataset.respondida === "true") return; puntos += i; divEvaluacion.innerHTML = `<strong>Otorga ${i} puntos.</strong>`; textarea.disabled = true; botonEvaluar.disabled = true; divPregunta.dataset.respondida = "true"; sonido("sonidoCorrecto"); verificarFinCuestionario(); }; divEvaluacion.appendChild(btnPuntaje); }
+        textarea.disabled = true; botonEvaluar.disabled = true;
+    }
+
+    function actualizarVidas() {
+        const vidasElement = document.getElementById("vidas"); vidasElement.classList.remove('vidas-bajas');
+        if (infiniteLives) { vidasElement.textContent = "Vidas: ∞"; }
+        else {
+            vidasElement.textContent = `Vidas: ${vidas}`; if (vidas <= 1 && vidas >= 0) vidasElement.classList.add('vidas-bajas');
+            if (vidas <= 0) {
+                mostrarResultadoFinal("¡Te has quedado sin vidas!");
+                document.getElementById("formCuestionario").querySelectorAll("input:not(:disabled), textarea:not(:disabled), button:not(:disabled)").forEach(el => { if(el.id !== 'theme-toggle-button') el.disabled = true; });
+                const resultadoDiv = document.getElementById("resultado"); setTimeout(() => { resultadoDiv.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+                clearTimeout(gameOverTimeout); gameOverTimeout = setTimeout(() => { if (currentQuizName) reiniciarCuestionario(); }, 5000);
+            }
+        }
+    }
+
+     function verificarFinCuestionario() {
+        if (!infiniteLives && vidas <= 0) return; const todasRespondidas = Array.from(document.querySelectorAll('#formCuestionario > div[data-respondida]')).every(div => div.dataset.respondida === "true");
+        if (todasRespondidas) mostrarResultadoFinal("¡Cuestionario completado!");
+    }
+
+    function mostrarResultadoFinal(mensaje) {
+        clearTimeout(gameOverTimeout); if (!cuestionarioActual || !cuestionarioActual.preguntas) return;
+        const totalPuntosPosibles = cuestionarioActual.preguntas.reduce((sum, p) => sum + (p.puntos || puntosPorPregunta), 0); const porcentaje = totalPuntosPosibles > 0 ? Math.max(0, Math.min(100, (puntos / totalPuntosPosibles) * 100)) : 0;
+        const resultadoDiv = document.getElementById("resultado"); resultadoDiv.innerHTML = `<h3 style="margin-top: 30px; text-align: center;">${mensaje}</h3><p style="text-align: center; font-size: 1.1em; margin-bottom: 15px;">Puntuación: <strong>${puntos}</strong> / ${totalPuntosPosibles}</p><p style="text-align: center; color: var(--text-muted-color);">(${porcentaje.toFixed(1)}%)</p>`;
+        if (infiniteLives || vidas > 0) { setTimeout(() => { resultadoDiv.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100); }
+    }
+
+    function reiniciarCuestionario() {
+      clearTimeout(gameOverTimeout); if (currentQuizName && localStorage.getItem(currentQuizName)) cargarCuestionario(currentQuizName);
+      else { alert("No hay cuestionario cargado o fue eliminado."); volverLista(); }
+    }
+
+    function sonido(id) {
+      try { const audio = document.getElementById(id); if (audio) { audio.currentTime = 0; audio.play().catch(e => {}); } }
+      catch (e) { console.error("Error sonido:", e); }
+    }
+
+    window.onload = () => { cargarLista(); };
+
+  </script>
+</body>
+</html>
